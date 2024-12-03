@@ -1,16 +1,26 @@
----
-layout: landing
----
+# Introduction
 
-import { HomePage } from 'vocs/components'
+ERC-7786 is a proposed standard that defines an interface for contracts to send and receive cross-chain messages. It aims to enhance composability and interoperability among different cross-chain messaging protocols, enabling smart contracts to communicate across blockchains seamlessly.
+Rather than creating isolated interfaces for each cross-chain protocol, ERC-7786 establishes a unified gateway for sending and receiving messages. Messaging protocols that do not natively implement this standard can integrate via adapters, ensuring broad compatibility. The standard uses modular attributes to allow for additional protocol-specific features without breaking the core functionality of simple cross-chain messaging.
 
-<HomePage.Root>
-  <HomePage.Logo />
-  <HomePage.Tagline>My Awesome Docs</HomePage.Tagline>
-  <HomePage.InstallPackage name="vocs" type="init" />
-  <HomePage.Description>This is a description of my documentation website.</HomePage.Description>
-  <HomePage.Buttons>
-    <HomePage.Button href="/getting-started" variant="accent">Get started</HomePage.Button>
-    <HomePage.Button href="https://github.com/wevm/vocs">GitHub</HomePage.Button>
-  </HomePage.Buttons>
-</HomePage.Root>
+## Key Features
+
+	1.	Universal Interface: Smart contracts can use a single interface for cross-chain messaging, reducing vendor lock-in and improving portability.
+	2.	Extensibility: Protocol-specific features can be implemented as attributes, making the standard flexible while maintaining a shared core of functionality.
+	3.	Compatibility Beyond EVM: ERC-7786 is designed to work with chains outside of Ethereum and EVM ecosystems, fostering broader adoption.
+	4.	Post-Processing Support: Some protocols require additional parameters or actions to complete message delivery. ERC-7786 accommodates these requirements via post-processing or attributes.
+	5.	Secure Message Handling: The standard ensures that cross-chain messages are verified and processed securely, protecting assets and permissions.
+
+## How It Works
+
+- Sending Messages: A SourceGateway contract allows a sender to specify the destination chain, receiver address, message payload, and optional attributes. The gateway processes the request and emits a MessagePosted event.
+- Receiving Messages: A DestinationGateway validates the message using the cross-chain protocol and delivers it to the receiver contract via the executeMessage function.
+- Attributes: Attributes enable advanced functionality such as setting gas limits, passing metadata, or handling protocol-specific requirements.
+
+## Example Use Cases
+
+	1.	Cross-Chain Token Transfers: Transfer tokens across blockchains while including metadata, such as gas fees or payment conditions, in a decentralized manner.
+	2.	Cross-Chain Governance: Execute governance decisions across multiple chains by sending proposals or votes from one chain to another.
+	3.	Cross-Chain NFT Actions: Enable users to mint or transfer NFTs on one chain while reflecting changes on another.
+
+ERC-7786 is currently in the draft stage, and the community is actively discussing enhancements to attributes, payload structures, and metadata handling. By standardizing cross-chain messaging, ERC-7786 opens the door for a new class of cross-chain native applications while reducing the complexities and risks associated with proprietary implementations.

@@ -1,15 +1,23 @@
 import { defineConfig } from 'vocs'
 
 export default defineConfig({
-  title: 'Docs',
+  title: 'ERC-7786',
   sidebar: [
     {
-      text: 'Getting Started',
-      link: '/getting-started',
+    text: 'Introduction',
+      link: "/",
     },
     {
-      text: 'Example',
-      link: '/example',
+      text: 'Cross-Chain Standards',
+      link: '/cross-chain-standards',
+    },
+    {
+      text: 'Implementation Example',
+      link: '/implementation-example',
+    },
+    {
+      text: 'References',
+      link: '/references',
     },
   ],
 })
