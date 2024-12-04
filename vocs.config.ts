@@ -12,16 +12,16 @@ export default defineConfig({
       link: '/erc',
     },
     {
-      text: 'Cross-Chain Standards',
-      link: '/cross-chain-standards',
+      text: 'Comparison',
+      link: '/comparison',
     },
     {
-      text: 'Implementation Example',
-      link: '/implementation-example',
+      text: 'Usage Example',
+      link: '/usage-example',
     },
     {
-      text: 'References',
-      link: '/references',
+      text: 'FAQ',
+      link: '/faq',
     },
   ],
 })
