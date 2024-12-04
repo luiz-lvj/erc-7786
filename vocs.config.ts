@@ -4,8 +4,12 @@ export default defineConfig({
   title: 'ERC-7786',
   sidebar: [
     {
-    text: 'Introduction',
-      link: "/",
+      text: 'Introduction',
+      link: '/',
+    },
+    {
+      text: 'Read the ERC',
+      link: '/erc',
     },
     {
       text: 'Cross-Chain Standards',
