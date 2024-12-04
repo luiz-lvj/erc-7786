@@ -1,7 +1,6 @@
 # Introduction
 
-ERC-7786 is a proposed standard that defines an interface for contracts to send and receive cross-chain messages. It aims to enhance composability and interoperability among different cross-chain messaging protocols, enabling smart contracts to communicate across blockchains seamlessly.
-Rather than creating isolated interfaces for each cross-chain protocol, ERC-7786 establishes a unified gateway for sending and receiving messages. Messaging protocols that do not natively implement this standard can integrate via adapters, ensuring broad compatibility. The standard uses modular attributes to allow for additional protocol-specific features without breaking the core functionality of simple cross-chain messaging.
+ERC-7786 is a proposed standard that defines an interface for contracts to send and receive cross-chain messages. It aims to improve composability and interoperability among the various cross-chain messaging protocols. Instead of developing applications against the proprietary and isolated interface of a single protocol, ERC-7786 allows app developers to use a common framework, minimizing lock-in to specific vendors or technologies. If needed, protocol-specific features can remain available under this common framework through non-standard _attributes_, without breaking interoperability of the core functionality of simple cross-chain messaging. Messaging protocols that do not natively implement this standard can be brought into the framework via adapters, ensuring broad compatibility.
 
 ## Key Features
 
