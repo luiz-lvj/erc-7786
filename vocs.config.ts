@@ -16,6 +16,10 @@ export default defineConfig({
       link: '/comparison',
     },
     {
+      text: 'Ecosystem',
+      link: '/ecosystem',
+    },
+    {
       text: 'Usage Example',
       link: '/usage-example',
     },
