@@ -11,21 +11,21 @@ export default defineConfig({
       text: 'Read the ERC',
       link: '/erc',
     },
-    {
-      text: 'Comparison',
-      link: '/comparison',
-    },
+    // {
+    //   text: 'Comparison',
+    //   link: '/comparison',
+    // },
     {
       text: 'Ecosystem',
       link: '/ecosystem',
     },
-    {
-      text: 'Usage Example',
-      link: '/usage-example',
-    },
-    {
-      text: 'FAQ',
-      link: '/faq',
-    },
+    // {
+    //   text: 'Usage Example',
+    //   link: '/usage-example',
+    // },
+    // {
+    //   text: 'FAQ',
+    //   link: '/faq',
+    // },
   ],
 })
