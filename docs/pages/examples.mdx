@@ -1,0 +1,75 @@
+# Examples
+
+## 1. Sending Message using ERC7786 with Axelar adapter
+
+This tutorial is using `Base Sepolia` as source chain and `Arbitrum Sepolia` as destination chain.
+
+### Concepts
+
+ERC7786 defines two main interfaces for cross-chain messaging:
+
+1. `IERC7786GatewaySource` - The source chain interface that allows sending messages. Key components:
+   - `sendMessage`: Function to initiate message sending, taking:
+     - destinationChain (CAIP-2 format, e.g. "eip155:421614" for Arbitrum Sepolia)
+     - receiver address
+     - payload (arbitrary bytes)
+     - attributes (optional protocol-specific parameters)
+   - Returns an outbox ID to track the message
+   - Emits a `MessagePosted` event
+
+2. `IERC7786Receiver` - The destination chain interface that receives messages. Key components:
+   - `executeMessage`: Function called by the destination gateway to deliver the message
+   - Must verify the calling gateway is trusted
+   - Must return a specific selector (0x675b049b) to confirm successful execution
+
+Important concepts to understand:
+
+- Messages require proper setup of source and destination gateways that implement these interfaces
+- Chain identifiers follow the CAIP-2 standard (e.g. "eip155:421614" for Arbitrum Sepolia)
+- Some protocols (like Axelar) may require additional steps like:
+  - Registering chain equivalences between protocol-specific and CAIP-2 identifiers
+  - Registering remote adapter addresses
+  - Paying for destination chain gas fees and potentially relayer or protocol fees
+  - Message approval and execution on the destination chain
+
+The standard is designed to be protocol-agnostic while allowing protocol-specific features through the attributes parameter.
+
+### Setup
+
+1. The first step is to deploy the adapters on source and destination chains. Adapters can be receive-only, send-only or work both ways. In order to be able to send messages in 
+both directions, we deployed [`AxelarGatewayDuplex.sol`](https://github.com/OpenZeppelin/openzeppelin-community-contracts/blob/master/contracts/crosschain/axelar/AxelarGatewayDuplex.sol) in both chains.
+Note that when deploying the contract, one of the constructor parameters is the Axelar gateway proxy, which is the contract responsible for receiving (or sending) all messages in the respective chain. 
+Note that each chain has its own gateway proxy (at least one). This archicteture is used to centralize all messages in one place, where relayers can easily listen for events. 
+This is equivalent to LayerZero Endpoints and Hyperlane Mailboxes, for example. The contract addresses for the gateways on different chains for Axelar can be seen at its [docs](https://docs.axelar.dev/resources/contract-addresses/testnet/).
+    
+    - Contract deployed on source chain: [0xBb6A11d2FdEF18522cC9d14DdAdb676c8c126AEE](https://sepolia.basescan.org/address/0xBb6A11d2FdEF18522cC9d14DdAdb676c8c126AEE)
+    - Contract deployed on destination chain: [0x050193203845D4145Dea5200C7eA49EF28b5f870](https://sepolia.arbiscan.io/address/0x050193203845d4145dea5200c7ea49ef28b5f870)
+
+2. With the contracts deployed (source and destination chains), we need to register the chain equivalence between axelar ids and the ERC7786 standard. Note that when sending a message, the destination chain [parameter](https://github.com/OpenZeppelin/openzeppelin-community-contracts/blob/cc554fc5cfee7498dc0177beb01118e4499826f6/contracts/crosschain/axelar/AxelarGatewaySource.sol#L29) 
+should follow the [CAIP-2](https://github.com/ChainAgnostic/CAIPs/blob/main/CAIPs/caip-2.md) standard to identify the destination chain. However, Axelar uses its own set of ids for the [chains](https://docs.axelar.dev/resources/contract-addresses/testnet/). This is also the case for other protocols such as LayerZero, with its [eids](https://docs.layerzero.network/v2/deployments/deployed-contracts).
+This way, it's important to map CAIP-2 identifiers to each bridge protocol set of chain identifiers. [`AxelarGatewatBase.sol`](https://github.com/OpenZeppelin/openzeppelin-community-contracts/blob/cc554fc5cfee7498dc0177beb01118e4499826f6/contracts/crosschain/axelar/AxelarGatewayBase.sol#L52) solves this by registering a chain equivalence with the identifiers.
+
+    - In [this transaction](https://sepolia.basescan.org/tx/0x12fe4b47bc3c73e3b91b1fb419cce3cd48763b91a65453c1fce66c0cacbd1083), we register a chain equivalence between `eip155:421614` and `arbitrum-sepolia` (Axelar name identifier) 
+    - In [this transaction](https://sepolia.arbiscan.io/tx/0x667ce2bf4e42f59aa4979d86600bd1e1818757fb5b45c6ef67c4c998c03e59be), we register a chain equivalence between `eip155:84532` and `base-sepolia` (Axelar name identifier)
+
+3. The next step is to register the remote adapters so that the adapter on the source chain knows about the adapter on the destination chain (and vice-versa).
+    - In [this transaction](https://sepolia.basescan.org/tx/0x70ef6711458dc658c8a0a2512458259a78092c3f5085ce5cbfa902d32399737a), we map the address `0x050193203845D4145Dea5200C7eA49EF28b5f870` (adapter on destination chain) to its chain's CAIP-2 identifier (`eip155:421614`).
+    - In [this transaction](https://sepolia.arbiscan.io/tx/0xdfea565845e230688ee0ac365a81992a08044aa092f59b9f7da96bf07bb12605), we map the address `0xBb6A11d2FdEF18522cC9d14DdAdb676c8c126AEE` (adapter on source chain) to its chain's CAIP-2 identificer (`eip155:84532`).
+
+4. With the adapters configured, we just need a contract on the destination chain following [`IERC7786Receiver`](https://github.com/OpenZeppelin/openzeppelin-community-contracts/blob/cc554fc5cfee7498dc0177beb01118e4499826f6/contracts/interfaces/IERC7786.sol#L54), in order to receive and execute the message.
+    - Receiver contract deployed on destination chain: [0x60Ff0d6060722DB7357F6976C8E5B8f2F42b8759](https://sepolia.arbiscan.io/address/0x60Ff0d6060722DB7357F6976C8E5B8f2F42b8759)
+
+### Sending Message
+1. To send a message, the function `sendMessage` should be called in the source chain adapter.
+    - In [this transaction](https://sepolia.basescan.org/tx/0x17ba37bb149496b93579eb43c6548ae5f1a527bf256c8170cae503d8d65dd963), we are sending a message from the source chain to the destination chain. 
+    The parameters are: `eip155:421614` (destinationChain, following the CAIP-2 standard), `0x60ff0d6060722db7357f6976c8e5b8f2f42b8759` (receiver, contract on the destination chain supporting IERC7786Receiver), a random payload and an empty list of attributes.
+
+2. The next step is to pay to pay for the execution on the destination chain. This can be done in multiple ways depending on the protocol and adapter.
+    - In [this transaction](https://sepolia.basescan.org/tx/0xb96ac0eb75d4319b32d137cef131ea654b96af997d330e694f41f84c9e7b35a8), we add native gas to the message using Axelar's native gas service.
+
+3. In Axelar's architecture, the message is approved by the gateway proxy and then executed by the adapter
+    - In [this transaction](https://sepolia.arbiscan.io/tx/0xaf98595be4d5c89236ffc1f24919c3f339f02665983bce75a07d865cb10166e0), we are approving the transaction in the gateway proxy.
+    - In [this transaction](https://sepolia.arbiscan.io/tx/0xa40d2f92d127be49352b006693bdd99b0d5c95b64d5578f46205714bb60bf6ae), we are executing the messge in the adapter (which calls the receiver).
+
+
+The whole flow (of setup and message sending) can be reproduced using [this script](https://github.com/OpenZeppelin/openzeppelin-community-contracts/blob/1af5e6901348ff47c46e4302c134bc5ec435a616/scripts/crosschain/send-crosschain-axelar.js) (not yet merged to master and not ready for production).

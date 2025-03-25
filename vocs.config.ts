@@ -8,8 +8,8 @@ export default defineConfig({
       link: '/',
     },
     {
-      text: 'Read the ERC',
-      link: '/erc',
+      text: 'Spec',
+      link: '/spec',
     },
     // {
     //   text: 'Comparison',
@@ -27,5 +27,13 @@ export default defineConfig({
     //   text: 'FAQ',
     //   link: '/faq',
     // },
+    {
+      text: 'Examples',
+      link: '/examples',
+    },
+    {
+      text: 'Multibridge',
+      link: '/multibridge',
+    },
   ],
 })
