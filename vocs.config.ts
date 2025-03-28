@@ -9,7 +9,7 @@ export default defineConfig({
     },
     {
       text: 'Spec',
-      link: '/spec',
+      link: '/erc',
     },
     // {
     //   text: 'Comparison',
@@ -32,8 +32,8 @@ export default defineConfig({
       link: '/examples',
     },
     {
-      text: 'Multibridge',
-      link: '/multibridge',
+      text: 'Aggregator',
+      link: '/aggregator',
     },
   ],
 })

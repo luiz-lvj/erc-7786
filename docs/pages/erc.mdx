@@ -26,37 +26,47 @@ Compared to previous ERCs in this area, this ERC offers compatibility with chain
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
+### Glossary of Terms
+ - **Origin chain:** The chain from where the sender is sending the message
+ - **Destination chain:** The chain where the message is received and executed
+ - **Source gateway:** A contract on the source chain that implements the ERC (natively or as an adapter) in order to send messages to receivers on other chains.
+ - **Destination gateway:** A contract on the destination chain that implements the ERC in order to receive messages from other chains.
+ - **Receiver:** The contract responsible for receiving the message and executing it in the destination chain (implements `IERC7786Receiver`).
+ - **CAIP-2:** Chain Agnostic Improvement Proposal that defines chain identifier format, i.e., chain ids.
+ - **CAIP-10:** Chain Agnostic Improvement Proposal that defines **account** identifier format.
+
+
 ### Message Field Encoding
 
 A cross-chain message consists of a sender, receiver, payload, and list of attributes.
 
-#### Sender & Receiver
+#### 1. Sender & Receiver
 
-The sender account (in the source chain) and receiver account (in the destination chain) MUST be represented using CAIP-10 account identifiers. Note that these are ASCII-encoded strings.
+ - The sender account (in the source chain) and receiver account (in the destination chain) MUST be represented using CAIP-10 account identifiers. Note that these are ASCII-encoded strings.
 
-A CAIP-10 account identifier embeds a CAIP-2 chain identifier along with an address. In some parts of the interface, the address and the chain parts will be provided separately rather than as a single string, or the chain part will be implicit.
+ - A CAIP-10 account identifier embeds a CAIP-2 chain identifier along with an address. In some parts of the interface, the address and the chain parts will be provided separately rather than as a single string, or the chain part will be implicit.
 
-#### Payload
+#### 2. Payload
 
-The payload is an opaque `bytes` value.
+- The payload is an opaque `bytes` value.
 
-#### Attributes
+#### 3. Attributes
 
-Attributes are structured pieces of message data and/or metadata. Each attribute is a key-value pair, where the key determines the type and encoding of the value, as well as its meaning and behavior.
+- Attributes are structured pieces of message data and/or metadata. Each attribute is a key-value pair, where the key determines the type and encoding of the value, as well as its meaning and behavior.
 
-Some attributes are message data that must be sent to the receiver, although they can be transformed as long as their meaning is preserved. Other attributes are metadata that will be used by the intervening gateways and potentially removed before the message reaches the receiver.
+- Some attributes are message data that must be sent to the receiver, although they can be transformed as long as their meaning is preserved. Other attributes are metadata that will be used by the intervening gateways and potentially removed before the message reaches the receiver.
 
-The set of attributes is extensible. It is RECOMMENDED to standardize attributes and their characteristics by publishing them as ERCs.
+- The set of attributes is extensible. It is RECOMMENDED to standardize attributes and their characteristics by publishing them as ERCs.
 
-A gateway MAY support any set of attributes. An empty attribute list MUST always be accepted by a gateway.
+- A gateway MAY support any set of attributes. An empty attribute list MUST always be accepted by a gateway.
 
-Each attribute key MUST have the format of a Solidity function signature, i.e., a name followed by a list of types in parentheses. For example, `minGasLimit(uint256)`.
+ - Each attribute key MUST have the format of a Solidity function signature, i.e., a name followed by a list of types in parentheses. For example, `minGasLimit(uint256)`.
 
-In this specification attributes are encoded as an array of `bytes` (i.e., `bytes[]`). Each element of the array MUST encode an attribute in the form of a Solidity function call, i.e., the first 4 bytes of the hash of the key followed by the ABI-encoded value.
+ - In this specification attributes are encoded as an array of `bytes` (i.e., `bytes[]`). Each element of the array MUST encode an attribute in the form of a Solidity function call, i.e., the first 4 bytes of the hash of the key followed by the ABI-encoded value.
 
 ### Sending Procedure
 
-An **Source Gateway** is a contract that offers a protocol to send a message to a receiver on another chain. It MUST implement `IERC7786GatewaySource`.
+A **Source Gateway** is a contract that offers a protocol to send a message to a receiver on another chain. It MUST implement `IERC7786GatewaySource`.
 
 ```solidity
 interface IERC7786GatewaySource {
@@ -166,6 +176,10 @@ Attributes are designed so that gateways can expose any specific features the br
 As some cross-chain communication protocols require additional parameters beyond the destination and the payload, and because we want to send messages through those bridges without any knowledge of these additional parameters, a post-processing of the message MAY be required (after `sendMessage` is called, and before the message is delivered). The additional parameters MAY be supported through attributes, which would remove the need for a post-processing step. If these additional parameters are not provided through an attribute, an additional call to the gateway is REQUIRED for the message to be sent. If possible, the gateway SHOULD be designed so that anyone with an incentive for the message to be delivered can jump in. A malicious actor providing invalid parameters SHOULD NOT prevent the message from being successfully relayed by someone else.
 
 Some protocols gateway support doing arbitrary direct calls on the receiver. In that case, the receiver must detect that they are being called by the gateway to properly identify cross-chain messages. Getters are available on the gateway to figure out where the cross-chain message comes from (source chain and sender address). This approach has the downside that it allows anyone to trigger any call from the gateway to any contract. This is dangerous if the gateway ever holds any assets [ERC-20](https://eips.ethereum.org/EIPS/eip-20) or similar. The use of a dedicated `executeMessage` function on the receiver protects any assets or permissions held by the gateway against such attacks. If the ability to perform direct calls is desired, this can be implemented as a wrapper on top of any gateway that implements this ERC.
+
+### Adapters
+
+For future 
 
 ## Backwards Compatibility
 
