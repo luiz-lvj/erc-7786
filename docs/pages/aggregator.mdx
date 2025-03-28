@@ -156,6 +156,18 @@ function getRemoteAggregator(string calldata caip2) public view virtual returns 
 }
 ```
 
+## Advantages
+
+The use of the ERC7786 Aggregator enhances security on cross-chain messaging by removing the trust in one single provider while still supporting the standard and giving flexibility to developers. For example, in a 2 out of 3 aggregator (3 gateways and threshold of 2):
+
+ - If one bridge is compromised, the sender is safe (message won't be executed)
+ - If one bridge is down, the messages are still delivered (by the other 2 gateways)
+ - If one bridge is slow, the messages can be sent in a fast way by the other 2 gateways
+
+## Implementation
+
+The implementation of the ERC7786 Aggregator is available [here](https://github.com/OpenZeppelin/openzeppelin-community-contracts/blob/master/contracts/crosschain/ERC7786Aggregator.sol).
+
 
 
 
