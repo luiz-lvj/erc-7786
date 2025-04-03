@@ -1,0 +1,173 @@
+# ERC7786 Aggregator
+
+## Why does it matter?
+
+When someone sends a cross-chain message using a given protocol, they're relying on its security, robustness and speed. This is ok for most retail users and use cases, but for some use cases, it might be necessary to add extra layers of security while handling with cross-chain messages.
+
+Since ERC7786 standardizes the way messages are sent and received on source and destination chains, although sent through different protocols, the messages must be the same on the destination chain, allowing one to send a message to various gateways and check if they are all were delivered properly.
+
+This is what `ERC7786Aggregator` brings to the table. The logic is similar to a multisig, where a threshold of signers must sign a transaction in order to execute it, in the aggregator the message sent from the source chain must be sucessfully sent through different gateways before being executed on the destination chain.
+
+## How it works
+
+The Aggregator supports both the `IERC7786GatewaySource` and `IERC7786Receiver` interfaces, i.e., someone sending a message using the aggregator interacts with it in the same way they would interact with an adapter or a native bridge that uses the standard.
+
+### Send Message
+The `sendMessage` function is used as expected:
+```solidity
+function sendMessage(
+    string calldata destinationChain,
+    string memory receiver,
+    bytes memory payload,
+    bytes[] memory attributes
+) public payable virtual whenNotPaused returns (bytes32 outboxId);
+```
+
+The difference for a normal bridge or adapter is on how it sends the message to all the different gateways:
+
+```solidity
+Outbox[] memory outbox = new Outbox[](_gateways.length());
+bool needsId = false;
+for (uint256 i = 0; i < outbox.length; ++i) {
+    address gateway = _gateways.at(i);
+    // send message
+    bytes32 id = IERC7786GatewaySource(gateway).sendMessage(
+        destinationChain,
+        aggregator,
+        wrappedPayload,
+        attributes
+    );
+    // if ID, track it
+    if (id != bytes32(0)) {
+        outbox[i] = Outbox(gateway, id);
+        needsId = true;
+    }
+}
+```
+
+Note that the the message is sent to all of the gateways on the `_gateways` array, assuming they all support the `IERC7786GatewaySource` as well.
+
+The set of gateways used is set on `constructor`, but can be modified by the owner:
+
+```solidity
+constructor(address owner_, address[] memory gateways_, uint8 threshold_) Ownable(owner_) {
+    for (uint256 i = 0; i < gateways_.length; ++i) {
+        _addGateway(gateways_[i]);
+    }
+    _setThreshold(threshold_);
+}
+
+function addGateway(address gateway) public virtual onlyOwner {
+    _addGateway(gateway);
+}
+
+function removeGateway(address gateway) public virtual onlyOwner {
+    _removeGateway(gateway);
+}
+```
+
+Also, the threshold is defined at the `constructor`, but can be changed by the owner:
+
+```solidity
+function setThreshold(uint8 newThreshold) public virtual onlyOwner {
+    _setThreshold(newThreshold);
+}
+```
+
+
+### Execute Message
+
+When receiving the message, the `executeMessage` is also used as expected:
+
+```solidity
+function executeMessage(
+    string calldata /*messageId*/, // gateway specific, empty or unique
+    string calldata sourceChain, // CAIP-2 chain identifier
+    string calldata sender, // CAIP-10 account address (does not include the chain identifier)
+    bytes calldata payload,
+    bytes[] calldata attributes
+) public payable virtual whenNotPaused returns (bytes4);
+```
+
+The difference for a normal bridge or adapter is that the message is only really executed when threshold is reached:
+
+```solidity
+// If ready to execute, and not yet executed
+if (tracker.countReceived >= getThreshold()) {
+    // prevent re-entry
+    tracker.executed = true;
+
+    bytes memory call = abi.encodeCall(
+        IERC7786Receiver.executeMessage,
+        (uint256(id).toHexString(32), sourceChain, originalSender, unwrappedPayload, attributes)
+    );
+    // slither-disable-next-line reentrancy-no-eth
+    (bool success, bytes memory returndata) = receiver.parseAddress().call(call);
+
+    if (!success) {
+        // rollback to enable retry
+        tracker.executed = false;
+        emit ExecutionFailed(id);
+    } else if (bytes32(returndata) == bytes32(IERC7786Receiver.executeMessage.selector)) {
+        // call successful and correct value returned
+        emit ExecutionSuccess(id);
+    } else {
+        // call successful but invalid value returned, we need to revert the subcall
+        revert ERC7786AggregatorInvalidExecutionReturnValue();
+    }
+}
+```
+
+The way it works is by each gateway on the destination chain sending the message to the aggregator (also on the destination chain), which keeps counting how many messages were received until the threshold is reached.
+
+```solidity
+// Message reception tracker
+bytes32 id = keccak256(abi.encode(sourceChain, sender, payload, attributes));
+Tracker storage tracker = _trackers[id];
+
+// If call is first from a trusted gateway
+if (_gateways.contains(msg.sender) && !tracker.receivedBy[msg.sender]) {
+    // Count number of time received
+    tracker.receivedBy[msg.sender] = true;
+    ++tracker.countReceived;
+    emit Received(id, msg.sender);
+
+    // if already executed, leave gracefully
+    if (tracker.executed) return IERC7786Receiver.executeMessage.selector;
+} else if (tracker.executed) {
+    revert ERC7786AggregatorAlreadyExecuted();
+}
+```
+
+Note that the message is executed by the aggregator when threshold is reached but more messages (from the bridges and adapters) can be sent to it. If that happens, the aggregator receives it but doesn't execute the message again.
+
+Also note that in the same way that adapters and bridge usually have to register their counterparts on the destination chain, the aggregator on the destination chain is registered by the aggregator in the source chain.
+
+
+```solidity
+function registerRemoteAggregator(string memory caip2, string memory aggregator) public virtual onlyOwner {
+    _registerRemoteAggregator(caip2, aggregator);
+}
+
+function getRemoteAggregator(string calldata caip2) public view virtual returns (string memory) {
+    string memory aggregator = _remotes[caip2];
+    if (bytes(aggregator).length == 0) revert ERC7786AggregatorRemoteNotRegistered(caip2);
+    return aggregator;
+}
+```
+
+## Advantages
+
+The use of the ERC7786 Aggregator enhances security on cross-chain messaging by removing the trust in one single provider while still supporting the standard and giving flexibility to developers. For example, in a 2 out of 3 aggregator (3 gateways and threshold of 2):
+
+ - If one bridge is compromised, the sender is safe (message won't be executed)
+ - If one bridge is down, the messages are still delivered (by the other 2 gateways)
+ - If one bridge is slow, the messages can be sent in a fast way by the other 2 gateways
+
+## Implementation
+
+The implementation of the ERC7786 Aggregator is available [here](https://github.com/OpenZeppelin/openzeppelin-community-contracts/blob/master/contracts/crosschain/ERC7786Aggregator.sol).
+
+
+
+

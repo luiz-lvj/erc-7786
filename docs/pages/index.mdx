@@ -1,25 +1,62 @@
 # Introduction
 
-ERC-7786 is a proposed standard that defines an interface for contracts to send and receive cross-chain messages. It aims to improve composability and interoperability among the various cross-chain messaging protocols. Instead of developing applications against the proprietary and isolated interface of a single protocol, ERC-7786 allows app developers to use a common framework, minimizing lock-in to specific vendors or technologies. If needed, protocol-specific features can remain available under this common framework through non-standard _attributes_, without breaking interoperability of the core functionality of simple cross-chain messaging. Messaging protocols that do not natively implement this standard can be brought into the framework via adapters, ensuring broad compatibility.
+## Welcome to ERC-7786: The Crosschain Messaging Gateway
 
-## Key Features
+ERC-7786 is a proposed standard for a crosschain messaging gateway. 
 
-	1.	Universal Interface: Smart contracts can use a single interface for cross-chain messaging, reducing vendor lock-in and improving portability.
-	2.	Extensibility: Protocol-specific features can be implemented as attributes, making the standard flexible while maintaining a shared core of functionality.
-	3.	Compatibility Beyond EVM: ERC-7786 is designed to work with chains outside of Ethereum and EVM ecosystems, fostering broader adoption.
-	4.	Post-Processing Support: Some protocols require additional parameters or actions to complete message delivery. ERC-7786 accommodates these requirements via post-processing or attributes.
-	5.	Secure Message Handling: The standard ensures that cross-chain messages are verified and processed securely, protecting assets and permissions.
+The vision of this proposal is to standardize a common interface decentralized applications (dApps) can use to securely send and receive messages across multiple blockchains. By encoding a standard set of functions, developers would be able to access any compliant crosschain messaging protocol. 
 
-## How It Works
+Users, liquidity and applications are spread across multiple blockchains – within the Ethereum Virtual Machine (EVM) ecosystem and beyond. ERC-7786 is designed to unlock improved crosschain user experience and mitigate risk, by enabling applications with cross-chain capabilities that are built in, and compatible with any bridge. 
 
-- Sending Messages: A SourceGateway contract allows a sender to specify the destination chain, receiver address, message payload, and optional attributes. The gateway processes the request and emits a MessagePosted event.
-- Receiving Messages: A DestinationGateway validates the message using the cross-chain protocol and delivers it to the receiver contract via the executeMessage function.
-- Attributes: Attributes enable advanced functionality such as setting gas limits, passing metadata, or handling protocol-specific requirements.
+ERC-7786 has been proposed by [OpenZeppelin](https://www.openzeppelin.com/) with support from Interop Labs, the initial developer of [Axelar Network](https://www.axelar.network/) as part of wider initiatives to enhance Ethereum scalability. 
 
-## Example Use Cases
+## Introduction to Crosschain Messaging
 
-	1.	Cross-Chain Token Transfers: Transfer tokens across blockchains while including metadata, such as gas fees or payment conditions, in a decentralized manner.
-	2.	Cross-Chain Governance: Execute governance decisions across multiple chains by sending proposals or votes from one chain to another.
-	3.	Cross-Chain NFT Actions: Enable users to mint or transfer NFTs on one chain while reflecting changes on another.
+Ethereum’s crosschain journey has been driven by the wide success of the chain. With a vibrant community of builders introducing new use cases, markets, and ideas, the requirements of the builders and DApps grew. 
 
-ERC-7786 is currently in the draft stage, and the community is actively discussing enhancements to attributes, payload structures, and metadata handling. By standardizing cross-chain messaging, ERC-7786 opens the door for a new class of cross-chain native applications while reducing the complexities and risks associated with proprietary implementations.
+The need to scale was evident and the Ethereum community answered the call. While the expansion of the Layer 2 (L2) blockchain network has been widely successful in bringing down transaction costs, enabling experimentation, and facilitating the entry of new users to the Ethereum ecosystem, it has not been without challenges of its own.
+
+One of these challenges has been **crosschain interoperability**: Different blockchains, such as Ethereum and the various L2s, do not natively communicate with each other. 
+
+Crosschain messaging protocols enable interoperability between these different protocols by allowing smart contracts on one blockchain to securely interact with contracts, users and assets on another blockchain through the transfer of data. 
+
+One popular use case of messaging protocols is bridges. These are often used to make tokens available for use across blockchain networks in DeFi protocols, on-chain games, and socialFi. In addition to moving tokens, messaging protocols can securely transfer data, function calls and other payloads between blockchains. 
+
+There are currently a number of protocols which enable crosschain communication. While these protocols have made crosschain activities a reality, the development of multiple different technical solutions and methodologies has come at the cost of lacking composability and a unified developer and user experience. 
+
+## Benefits of ERC-7786
+
+ - **Enhances Ethereum Scalability** by providing a single universal interface for crosschain messaging, uniting Ethereum, the various L2 blockchains, and beyond through broader interoperability. 
+
+ - **Increases User and Developer Choice**: reducing vendor lock-in and improving portability. 
+
+ - **Improves the Developer Experience**: Protocol-specific features can be implemented as attributes, making the standard flexible while maintaining a shared core of functionality.
+
+ - **Design Flexibility**: Some protocols require additional parameters or actions to complete message delivery. ERC-7786 accommodates these requirements via post-processing or attributes. 
+
+ - **Enhanced Security**: The standard ensures that cross-chain messages are verified and processed securely, protecting assets and permissions.
+
+ - **Compatibility Beyond EVM**: ERC-7786 is designed to work with chains outside of Ethereum and EVM ecosystems, fostering wider adoption of blockchain technology and unlocking liquidity from other blockchains while growing Ethereum and the L2 ecosystem. 
+
+
+## The Ethereum Interoperability Working Group
+
+The Interoperability Working Group is an initiative led by the Ethereum Foundation to bring all the projects working on this matter and work together towards the same goal: scale the Ethereum ecosystem making it truly interoperable.
+
+Layer 2s, crosschain messaging protocols, rollups, bridges, oracles, and applications are now working together on open standards and frameworks to unify Ethereum and beyond. 
+
+## Join the Conversation:  
+
+ERC-7768 is currently in the draft stage. We value community input!
+
+## Contact Us:  
+
+OpenZeppelin 
+
+Axelar 
+
+Learn More: 
+
+Ethereum L2 Interop [repository](https://github.com/ethereum/L2-interop): 
+
+[Working Group Calls](https://github.com/ethereum/pm/issues/1367)
