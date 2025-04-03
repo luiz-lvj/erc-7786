@@ -4,69 +4,59 @@
 
 ERC-7786 is a proposed standard for a crosschain messaging gateway. 
 
-The vision of this proposal is to standardize how smart contracts send and receive messages via a common interface, regardless of the messaging protocol employed. 
+The vision of this proposal is to standardize a common interface decentralized applications (dApps) can use to securely send and receive messages across multiple blockchains. By encoding a standard set of functions, developers would be able to access any compliant crosschain messaging protocol. 
 
-This unlocks improved crosschain user experience, mitigates risk, and enables a new class of crosschain native smart contracts while improving Ethereum interoperability by enabling composability among the various crosschain messaging protocols. 
+Users, liquidity and applications are spread across multiple blockchains – within the Ethereum Virtual Machine (EVM) ecosystem and beyond. ERC-7786 is designed to unlock improved crosschain user experience and mitigate risk, by enabling applications with cross-chain capabilities that are built in, and compatible with any bridge. 
+
+ERC-7786 has been proposed by [OpenZeppelin](https://www.openzeppelin.com/) with support from Interop Labs, the initial developer of [Axelar Network](https://www.axelar.network/) as part of wider initiatives to enhance Ethereum scalability. 
 
 ## Introduction to Crosshain Messaging
 
 Ethereum’s crosschain journey has been driven by its wide adoption success. With a vibrant community of builders introducing new use cases, markets, and ideas, the requirements of the builders and DApps grew. 
 
-The need to scale was evident and the Ethereum community answered the call. While the expansion of the L2 network has been widely successful in bringing down transaction costs, enabling experimentation, and facilitating the entry of new users to the Ethereum ecosystem, it has not been without challenges of its own. One of these challenges has been interoperability. 
+The need to scale was evident and the Ethereum community answered the call. While the expansion of the Layer 2 (L2) blockchain network has been widely successful in bringing down transaction costs, enabling experimentation, and facilitating the entry of new users to the Ethereum ecosystem, it has not been without challenges of its own.
 
-Different blockchains, such as Ethereum and the network of L2s and rollups, do not natively communicate with each other. 
+One of these challenges has been **crosschain interoperability**: Different blockchains, such as Ethereum and the various L2s, do not natively communicate with each other. 
 
-Crosschain messaging protocols enable interoperability between these different protocols by allowing smart contracts on one blockchain to interact with contracts and assets on another through the transfer of data. 
+Crosschain messaging protocols enable interoperability between these different protocols by allowing smart contracts on one blockchain to securely interact with contracts, users and assets on another blockchain through the transfer of data. 
 
-One popular use case of messaging protocols is bridges. These are often used to transfer assets, tokens, and NFTs across blockchain networks for use in DeFi protocols, on-chain games, and socialFi.
+One popular use case of messaging protocols is bridges. These are often used to make tokens available for use across blockchain networks in DeFi protocols, on-chain games, and socialFi. In addition to moving tokens, messaging protocols can securely transfer data, function calls and other payloads between blockchains. 
 
-There are currently a number of protocols which enable crosschain communication. While this growing network of protocols has made crosschain activities a reality, the development of multiple different technical solutions and methodologies has come at the cost of broader compostability and a unified developer and user experience. 
-
-## ERC-7786 at a Glance
-
-The objective of ERC-7786 is to provide a standard interface to send and receive crosschain messages between smart contracts. 
-
-
-It allows app developers to use a common framework, minimizing lock-in to specific crosschain messaging technologies. Protocol-specific features can remain available under this common framework through non-standard attributes, without breaking interoperability of the core functionality of simple cross-chain messaging.
-
-Messaging protocols that do not natively implement this standard can be brought into the framework via adapters, ensuring broad compatibility with existing solutions, while reducing challenges and risks associated with lock-in to specific technologies and bridges. 
+There are currently a number of protocols which enable crosschain communication. While these protocols have made crosschain activities a reality, the development of multiple different technical solutions and methodologies has come at the cost of broader composability and a unified developer and user experience. 
 
 ## Benefits of ERC-7786
 
- - **Enhances Ethereum Scalability** by providing a single universal interface for crosschain messaging, uniting the Ethereum and L2 network through increased interoperability. 
+ - Enhances Ethereum Scalability by providing a single universal interface for crosschain messaging, uniting Ethereum, the various L2 blockchains, and beyond through broader interoperability. 
 
- - **Increases User Choice:** reducing vendor lock-in and improving portability. 
+ - Increases User and Developer Choice: reducing vendor lock-in and improving portability. 
 
- - **Improves the Developer Experience:** Protocol-specific features can be implemented as attributes, making the standard flexible while maintaining a shared core of functionality.
+ - Improves the Developer Experience: Protocol-specific features can be implemented as attributes, making the standard flexible while maintaining a shared core of functionality.
 
- - **Design Flexibility:** Some protocols require additional parameters or actions to complete message delivery. ERC-7786 accommodates these requirements via post-processing or attributes. 
+ - Design Flexibility: Some protocols require additional parameters or actions to complete message delivery. ERC-7786 accommodates these requirements via post-processing or attributes. 
 
- - **Enhanced Security:** The standard ensures that cross-chain messages are verified and processed securely, protecting assets and permissions.
+ - Enhanced Security: The standard ensures that cross-chain messages are verified and processed securely, protecting assets and permissions.
 
- - **Compatibility Beyond EVM:** ERC-7786 is designed to work with chains outside of Ethereum and EVM ecosystems, fostering wider adoption of blockchain technology and unlocking liquidity from other networks while growing Ethereum and the L2 network. 
+ - Compatibility Beyond EVM: ERC-7786 is designed to work with chains outside of Ethereum and EVM ecosystems, fostering wider adoption of blockchain technology and unlocking liquidity from other blockchains while growing Ethereum and the L2 ecosystem. 
 
-## The Interoperability Working Group
 
-ERC-7786 has been proposed by [OpenZeppelin](https://www.openzeppelin.com/) with support from Interop Labs, the initial developer of [Axelar Network](https://www.axelar.network/) as part of wider initiatives to enhance Ethereum scalability. 
+## The Ethereum Interoperability Working Group
 
 The Interoperability Working Group is an initiative led by the Ethereum Foundation to bring all the projects working on this matter and work together towards the same goal: scale the Ethereum ecosystem making it truly interoperable.
 
 Layer 2s, crosschain messaging protocols, rollups, bridges, oracles, and applications are now working together on open standards and frameworks to unify Ethereum and beyond. 
 
-## Join the Conversation
+## Join the Conversation:  
+
 ERC-7768 is currently in the draft stage. We value community input!
 
-### Contact us
+## Contact Us:  
 
 OpenZeppelin 
 
 Axelar 
 
+Learn More: 
 
-## Learn more:
-
-Ethereum L2 Interop [repository](https://github.com/ethereum/L2-interop)
+Ethereum L2 Interop [repository](https://github.com/ethereum/L2-interop): 
 
 [Working Group Calls](https://github.com/ethereum/pm/issues/1367)
-
-
