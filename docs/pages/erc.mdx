@@ -26,31 +26,21 @@ Compared to previous ERCs in this area, this ERC offers compatibility with chain
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119 and RFC 8174.
 
-### Glossary of Terms
- - **Origin chain:** The chain from where the sender is sending the message
- - **Destination chain:** The chain where the message is received and executed
- - **Source gateway:** A contract on the source chain that implements the ERC (natively or as an adapter) in order to send messages to receivers on other chains.
- - **Destination gateway:** A contract on the destination chain that implements the ERC in order to receive messages from other chains.
- - **Receiver:** The contract responsible for receiving the message and executing it in the destination chain (implements `IERC7786Receiver`).
- - **CAIP-2:** Chain Agnostic Improvement Proposal that defines chain identifier format, i.e., chain ids.
- - **CAIP-10:** Chain Agnostic Improvement Proposal that defines **account** identifier format.
-
-
 ### Message Field Encoding
 
 A cross-chain message consists of a sender, receiver, payload, and list of attributes.
 
-#### 1. Sender & Receiver
+#### Sender & Receiver
 
  - The sender account (in the source chain) and receiver account (in the destination chain) MUST be represented using CAIP-10 account identifiers. Note that these are ASCII-encoded strings.
 
  - A CAIP-10 account identifier embeds a CAIP-2 chain identifier along with an address. In some parts of the interface, the address and the chain parts will be provided separately rather than as a single string, or the chain part will be implicit.
 
-#### 2. Payload
+#### Payload
 
 - The payload is an opaque `bytes` value.
 
-#### 3. Attributes
+#### Attributes
 
 - Attributes are structured pieces of message data and/or metadata. Each attribute is a key-value pair, where the key determines the type and encoding of the value, as well as its meaning and behavior.
 
