@@ -13,6 +13,7 @@ This is what `ERC7786Aggregator` brings to the table. The logic is similar to a 
 The aggregator contract implements both the `IERC7786GatewaySource` and `IERC7786Receiver` interfaces. This means that from a caller’s perspective, sending a message through the aggregator works the same way as if they were interacting with any single ERC7786-compliant bridge or adapter. The difference is that instead of forwarding the message to just one endpoint, the aggregator dispatches it across multiple gateways.
 
 
+
 ### Configuring the Aggregator
 
 When the aggregator contract is first deployed, it accepts a list of initial gateways along with a threshold value. These gateways must be addresses of contracts that support the `IERC7786GatewaySource` interface. The threshold, on the other hand, is used to define the number of confirmations needed before a message is considered valid. During deployment, the constructor adds each gateway to an internal collection and sets the threshold to the provided value.
