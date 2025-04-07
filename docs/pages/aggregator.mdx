@@ -11,8 +11,9 @@ This is what `ERC7786Aggregator` brings to the table. The logic is similar to a 
 ## How it works
 
 The aggregator contract implements both the `IERC7786GatewaySource` and `IERC7786Receiver` interfaces. This means that from a caller’s perspective, sending a message through the aggregator works the same way as if they were interacting with any single ERC7786-compliant bridge or adapter. The difference is that instead of forwarding the message to just one endpoint, the aggregator dispatches it across multiple gateways.
+In the diagram below it's possible to see how a 2-out-of-3 aggregator works:
 
-
+![Aggregator diagram](https://raw.githubusercontent.com/luiz-lvj/erc-7786/technical/docs/assets/aggregator-diagram.jpg)
 
 ### Configuring the Aggregator
 
