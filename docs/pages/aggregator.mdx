@@ -25,7 +25,7 @@ After initialization, the contract owner retains the ability to adjust these set
 
  - **Update Threshold**: The owner can update the threshold whenever the system’s needs change. Depending on your protocol’s requirements, you might want a higher threshold for added security (e.g., requiring multiple gateways to confirm a message) or a lower threshold for quicker approvals and reduced costs.
 
-Because these functions can alter the fundamental behavior of how messages are dispatched and confirmed, they are restricted to the contract owner. By placing these controls in the hands of a trusted administrator, the aggregator can adapt to new conditions without compromising security.
+Because these functions can alter the fundamental behavior of how messages are dispatched and confirmed, they are restricted to the contract owner. Note that the security of the aggregator relies on an honest owner, so carefully consider what are acceptable trust assumptions in the context of your protocol.
 
 Just as bridges and adapters generally maintain a reference to their counterpart on the destination chain, the aggregator must also keep track of the corresponding aggregator contract that lives on each target chain. 
 This allows cross-chain messages to be validated and executed properly on both sides.
@@ -41,10 +41,6 @@ When the user calls the aggregator’s `sendMessage` function (compliant to `IER
  - **Collect message identifiers:** If any gateway returns an ID (represented as a `bytes32` value) when the message is sent, the aggregator records that ID in an “outbox” data structure. Each entry in this outbox links the gateway’s address to the ID it generated for tracking purposes.
 
  - **Aggregate results:** Because multiple gateways might generate different identifiers, the aggregator keeps track of all non-zero IDs it receives. These can be used later for confirmation or troubleshooting if a particular gateway’s message fails or encounters delays.
-
- - **Return an outbox identifier:** After processing all gateways, the aggregator can also provide a single identifier that references the entire operation, making it easier for the user to follow up on the message dispatch.
-
-Thanks to this approach, the aggregator allows an user to send a single cross-chain message in a standardized format — consistent with `ERC7786` — and still benefit from the redundancy of multiple gateways. This design minimizes trust in any single bridge and can offer additional security and reliability benefits in environments that demand a higher level of assurance.
 
 ### Execute Message
 
@@ -64,10 +60,6 @@ After incrementing the count of received deliveries, the aggregator checks wheth
 This call includes the message identifier (converted to a string), the source chain, the original sender, the original payload, and any attributes. Note that the receiver must implement the `IERC7786Receiver` interface.
 
 If this final call succeeds, the aggregator emits an event indicating that execution was successful. If it fails or returns an unexpected value, the aggregator rolls back the executed flag so that a retry might be possible, then emits an event to signal the failed attempt. Because multiple gateways may continue to deliver the same message after the threshold has been reached, the aggregator includes a safeguard that checks the executed flag and prevents any further attempts to execute the same message. This ensures the final recipient gets called only once, even when multiple gateways are involved.
-
-The threshold mechanism provides an added layer of security. Instead of relying on a single gateway to prove that a cross-chain message has arrived, the aggregator can wait for confirmations
-from several gateways before moving forward. Combined with the `ERC7786` standard, this design increases assurance that messages are delivered securely while maintaining compatibility for any adapters or bridges that also implement the standard.
-
 
 ## Advantages
 
