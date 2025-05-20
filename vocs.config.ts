@@ -15,10 +15,10 @@ export default defineConfig({
     //   text: 'Comparison',
     //   link: '/comparison',
     // },
-    {
-      text: 'Ecosystem',
-      link: '/ecosystem',
-    },
+    // {
+    //   text: 'Ecosystem',
+    //   link: '/ecosystem',
+    // },
     // {
     //   text: 'Usage Example',
     //   link: '/usage-example',
@@ -32,8 +32,8 @@ export default defineConfig({
       link: '/examples',
     },
     {
-      text: 'Aggregator',
-      link: '/aggregator',
+      text: 'Multi-Bridge',
+      link: '/multi-bridge',
     },
   ],
 })
