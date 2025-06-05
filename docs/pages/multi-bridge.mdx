@@ -6,14 +6,14 @@ When a cross-chain message is sent using a particular protocol, the sender inher
 
 Because ERC7786 defines a uniform process for transmitting and receiving messages on both the source and destination chains—even if they pass through different protocols—the resulting messages on the destination chain must be identical. This uniformity enables sending the same message to multiple gateways and confirming they all were delivered accurately.
 
-This is what `ERC7786Aggregator` brings to the table. The logic is similar to a multisig, where a threshold of signers must sign a transaction in order to execute it, in the aggregator the message sent from the source chain must be sucessfully sent through different gateways before being executed on the destination chain. The ERC7786 Aggregator is essentially a multi-bridge, enforcing that an identical cross-chain message is confirmed through multiple bridge gateways before it can execute on the destination chain.
+This is what `ERC7786Aggregator` brings to the table. The logic is similar to a multisig, where a threshold of signers must sign a transaction in order to execute it, in the aggregator the message sent from the source chain must be sucessfully sent through different gateways before being executed on the destination chain. The ERC7786 Aggregator is an open bridge, enforcing that an identical cross-chain message is confirmed through multiple bridge gateways before it can execute on the destination chain.
 
 ## How it works
 
 The aggregator contract implements both the `IERC7786GatewaySource` and `IERC7786Receiver` interfaces. This means that from a caller’s perspective, sending a message through the aggregator works the same way as if they were interacting with any single ERC7786-compliant bridge or adapter. The difference is that instead of forwarding the message to just one endpoint, the aggregator dispatches it across multiple gateways.
 In the diagram below it's possible to see how a 2-out-of-3 aggregator works:
 
-<img src="https://raw.githubusercontent.com/luiz-lvj/erc-7786/technical/docs/assets/image-multibridge.svg" alt="Aggregator diagram" width="100%" height="auto" />
+<img src="https://raw.githubusercontent.com/luiz-lvj/erc-7786/technical/docs/assets/image-openbridge.svg" alt="Aggregator diagram" width="100%" height="auto" />
 
 ### Configuring the Aggregator
 
