@@ -32,8 +32,8 @@ export default defineConfig({
       link: '/examples',
     },
     {
-      text: 'Multi-Bridge',
-      link: '/multi-bridge',
+      text: 'Open Bridge',
+      link: '/open-bridge',
     },
   ],
 
