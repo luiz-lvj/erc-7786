@@ -9,7 +9,7 @@ export default defineConfig({
     },
     {
       text: 'Spec',
-      link: '/erc',
+      link: '/spec',
     },
     // {
     //   text: 'Comparison',
@@ -33,7 +33,7 @@ export default defineConfig({
     },
     {
       text: 'OpenBridge',
-      link: '/open-bridge',
+      link: '/openbridge',
     },
   ],
 
