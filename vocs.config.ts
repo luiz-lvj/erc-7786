@@ -2,6 +2,8 @@ import { defineConfig } from 'vocs'
 
 export default defineConfig({
   title: 'ERC-7786',
+  description: "ERC-7786 is the standard for crosschain messaging",
+  ogImageUrl: "",
   sidebar: [
     {
       text: 'Introduction',
