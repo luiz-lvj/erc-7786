@@ -2,6 +2,8 @@ import { defineConfig } from 'vocs'
 
 export default defineConfig({
   title: 'ERC-7786',
+  description: "ERC-7786 is the standard for crosschain messaging",
+  ogImageUrl: "https://raw.githubusercontent.com/luiz-lvj/erc-7786/refs/heads/technical/docs/assets/metadata-image.jpg",
   sidebar: [
     {
       text: 'Introduction',
@@ -9,7 +11,7 @@ export default defineConfig({
     },
     {
       text: 'Spec',
-      link: '/erc',
+      link: '/spec',
     },
     // {
     //   text: 'Comparison',
@@ -32,8 +34,8 @@ export default defineConfig({
       link: '/examples',
     },
     {
-      text: 'Open Bridge',
-      link: '/open-bridge',
+      text: 'OpenBridge',
+      link: '/openbridge',
     },
   ],
 
