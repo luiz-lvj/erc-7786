@@ -32,7 +32,7 @@ export default defineConfig({
       link: '/examples',
     },
     {
-      text: 'Open Bridge',
+      text: 'OpenBridge',
       link: '/open-bridge',
     },
   ],
