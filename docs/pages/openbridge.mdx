@@ -1,4 +1,4 @@
-# ERC7786 Aggregator
+# ERC7786OpenBridge
 
 ## Why does it matter?
 
@@ -6,64 +6,64 @@ When a cross-chain message is sent using a particular protocol, the sender inher
 
 Because ERC7786 defines a uniform process for transmitting and receiving messages on both the source and destination chains—even if they pass through different protocols—the resulting messages on the destination chain must be identical. This uniformity enables sending the same message to multiple gateways and confirming they all were delivered accurately.
 
-This is what `ERC7786Aggregator` brings to the table. The logic is similar to a multisig, where a threshold of signers must sign a transaction in order to execute it, in the aggregator the message sent from the source chain must be sucessfully sent through different gateways before being executed on the destination chain. The ERC7786 Aggregator is an open bridge, enforcing that an identical cross-chain message is confirmed through multiple bridge gateways before it can execute on the destination chain.
+This is what `ERC7786OpenBridge` brings to the table. The logic is similar to a multisig, where a threshold of signers must sign a transaction in order to execute it, in the OpenBridge the message sent from the source chain must be sucessfully sent through different gateways before being executed on the destination chain. The ERC7786OpenBridge enforces that an identical cross-chain message is confirmed through multiple bridge gateways before it can execute on the destination chain.
 
 ## How it works
 
-The aggregator contract implements both the `IERC7786GatewaySource` and `IERC7786Receiver` interfaces. This means that from a caller’s perspective, sending a message through the aggregator works the same way as if they were interacting with any single ERC7786-compliant bridge or adapter. The difference is that instead of forwarding the message to just one endpoint, the aggregator dispatches it across multiple gateways.
-In the diagram below it's possible to see how a 2-out-of-3 aggregator works:
+The OpenBridge contract implements both the `IERC7786GatewaySource` and `IERC7786Receiver` interfaces. This means that from a caller’s perspective, sending a message through it works the same way as if they were interacting with any single ERC7786-compliant bridge or adapter. The difference is that instead of forwarding the message to just one endpoint, OpenBridge dispatches it across multiple gateways.
+In the diagram below it's possible to see how a 2-out-of-3 OpenBridge works:
 
-<img src="https://raw.githubusercontent.com/luiz-lvj/erc-7786/technical/docs/assets/image-openbridge.svg" alt="Aggregator diagram" width="100%" height="auto" />
+<img src="https://raw.githubusercontent.com/luiz-lvj/erc-7786/technical/docs/assets/image-openbridge.svg" alt="OpenBridge diagram" width="100%" height="auto" />
 
-### Configuring the Aggregator
+### Configuring the OpenBridge
 
-When the aggregator contract is first deployed, it accepts a list of initial gateways along with a threshold value. These gateways must be addresses of contracts that support the `IERC7786GatewaySource` interface. The threshold, on the other hand, is used to define the number of confirmations needed before a message is considered valid. During deployment, the constructor adds each gateway to an internal collection and sets the threshold to the provided value.
+When the OpenBridge contract is first deployed, it accepts a list of initial gateways along with a threshold value. These gateways must be addresses of contracts that support the `IERC7786GatewaySource` interface. The threshold, on the other hand, is used to define the number of confirmations needed before a message is considered valid. During deployment, the constructor adds each gateway to an internal collection and sets the threshold to the provided value.
 
 After initialization, the contract owner retains the ability to adjust these settings:
 
- - **Add or Remove Gateways**: The owner can introduce a new gateway address into the aggregator’s registry or remove an existing one. This flexibility allows the aggregator to evolve over time, accommodating new bridging solutions or removing deprecated ones.
+ - **Add or Remove Gateways**: The owner can introduce a new gateway address into the open bridge's registry or remove an existing one. This flexibility allows it to evolve over time, accommodating new bridging solutions or removing deprecated ones.
 
  - **Update Threshold**: The owner can update the threshold whenever the system’s needs change. Depending on your protocol’s requirements, you might want a higher threshold for added security (e.g., requiring multiple gateways to confirm a message) or a lower threshold for quicker approvals and reduced costs.
 
-Because these functions can alter the fundamental behavior of how messages are dispatched and confirmed, they are restricted to the contract owner. Note that the security of the aggregator relies on an honest owner, so carefully consider what are acceptable trust assumptions in the context of your protocol.
+Because these functions can alter the fundamental behavior of how messages are dispatched and confirmed, they are restricted to the contract owner. Note that the security of the OpenBridge relies on an honest owner, so carefully consider what are acceptable trust assumptions in the context of your protocol.
 
-Just as bridges and adapters generally maintain a reference to their counterpart on the destination chain, the aggregator must also keep track of the corresponding aggregator contract that lives on each target chain. 
+Just as bridges and adapters generally maintain a reference to their counterpart on the destination chain, the OpenBridge must also keep track of the corresponding OpenBridge contract that lives on each target chain. 
 This allows cross-chain messages to be validated and executed properly on both sides.
 
-From a technical standpoint, this registration process involves storing a mapping that associates the chain identifier (formatted as a `CAIP-2` string) with the address (or identifier) of the aggregator on that chain. The `registerRemoteAggregator` function is restricted to the contract owner to prevent unauthorized updates. When called, it updates this internal mapping so that the aggregator always knows which remote aggregator to reference for a given chain.
+From a technical standpoint, this registration process involves storing a mapping that associates the chain identifier with the address (or identifier) of the OpenBridge on that chain. The `registerRemoteAggregator` function is restricted to the contract owner to prevent unauthorized updates. When called, it updates this internal mapping so that the OpenBridge always knows which remote peer to reference for a given chain.
 
 ### Send Message
 
-When the user calls the aggregator’s `sendMessage` function (compliant to `IERC7786GatewaySource`), they pass as parameters the target chain name, the address (or identifier) of the receiver on that target chain, the payload data, and any additional attributes. Internally, the aggregator processes these inputs and passes them to each gateway in its registry:
+When the user calls the OpenBridge’s `sendMessage` function (compliant to `IERC7786GatewaySource`), they pass as parameters the target chain name, the address (or identifier) of the receiver on that target chain, the payload data, and any additional attributes. Internally, the open bridge processes these inputs and passes them to each gateway in its registry:
 
- - **Iterate through all gateways:** The aggregator keeps an array (named `_gateways`) that contains references to all supported gateways. Each gateway MUST implement `IERC7786GatewaySource` for message compatibility, so the aggregator can loop over this list and relay the same message to each gateway.
+ - **Iterate through all gateways:** The OpenBridge keeps an array (named `_gateways`) that contains references to all supported gateways. Each gateway MUST implement `IERC7786GatewaySource` for message compatibility, so it can loop over this list and relay the same message to each gateway.
 
- - **Collect message identifiers:** If any gateway returns an ID (represented as a `bytes32` value) when the message is sent, the aggregator records that ID in an “outbox” data structure. Each entry in this outbox links the gateway’s address to the ID it generated for tracking purposes.
+ - **Collect message identifiers:** If any gateway returns an ID (represented as a `bytes32` value) when the message is sent, the OpenBridge records that ID in an “outbox” data structure. Each entry in this outbox links the gateway’s address to the ID it generated for tracking purposes.
 
- - **Aggregate results:** Because multiple gateways might generate different identifiers, the aggregator keeps track of all non-zero IDs it receives. These can be used later for confirmation or troubleshooting if a particular gateway’s message fails or encounters delays.
+ - **Aggregate results:** Because multiple gateways might generate different identifiers, the OpenBridge keeps track of all non-zero IDs it receives. These can be used later for confirmation or troubleshooting if a particular gateway’s message fails or encounters delays.
 
 ### Execute Message
 
-On the destination chain, the aggregator implements the `IERC7786Receiver` interface by providing an `executeMessage` function. Unlike a typical bridge or adapter that immediately executes the received message, the aggregator postpones the final call to the message recipient until it has received enough confirmations from different gateways to meet the threshold.
+On the destination chain, the OpenBridge implements the `IERC7786Receiver` interface by providing an `executeMessage` function. Unlike a typical bridge or adapter that immediately executes the received message, it postpones the final call to the message recipient until it has received enough confirmations from different gateways to meet the threshold.
 
-When a gateway on the destination chain calls  `executeMessage`, the aggregator generates a unique identifier for the incoming message by hashing the the source chain, the sender, and the payload. It then references a tracking structure (`tracker`) that links this id to important details: 
+When a gateway on the destination chain calls  `executeMessage`, the OpenBridge generates a unique identifier for the incoming message by hashing the the source chain, the sender, and the payload. It then references a tracking structure (`tracker`) that links this id to important details: 
 
  - Which gateways have already delivered the message
 
  - How many confirmations have arrived
 
- - Whether or not the aggregator has already called the end recipient
+ - Whether or not the OpenBridge has already called the end recipient
 
-If the aggregator recognizes the gateway’s address as valid and sees that it hasn’t counted a delivery from this gateway yet, it updates the message’s `tracker` with the new information.
+If the OpenBridge recognizes the gateway’s address as valid and sees that it hasn’t counted a delivery from this gateway yet, it updates the message’s `tracker` with the new information.
 
-After incrementing the count of received deliveries, the aggregator checks whether the message has reached the threshold. If the threshold is met and the message has not yet been executed, the aggregator sets the executed flag to prevent re-entry, then constructs a function call to the intended recipient’s `executeMessage`. 
+After incrementing the count of received deliveries, the OpenBridge checks whether the message has reached the threshold. If the threshold is met and the message has not yet been executed, it sets the executed flag to prevent re-entry, then constructs a function call to the intended recipient’s `executeMessage`. 
 This call includes the message identifier (converted to a string), the source chain, the original sender, the original payload, and any attributes. Note that the receiver must implement the `IERC7786Receiver` interface.
 
-If this final call succeeds, the aggregator emits an event indicating that execution was successful. If it fails or returns an unexpected value, the aggregator rolls back the executed flag so that a retry might be possible, then emits an event to signal the failed attempt. Because multiple gateways may continue to deliver the same message after the threshold has been reached, the aggregator includes a safeguard that checks the executed flag and prevents any further attempts to execute the same message. This ensures the final recipient gets called only once, even when multiple gateways are involved.
+If this final call succeeds, the OpenBridge emits an event indicating that execution was successful. If it fails or returns an unexpected value, it rolls back the executed flag so that a retry might be possible, then emits an event to signal the failed attempt. Because multiple gateways may continue to deliver the same message after the threshold has been reached, the OpenBridge includes a safeguard that checks the executed flag and prevents any further attempts to execute the same message. This ensures the final recipient gets called only once, even when multiple gateways are involved.
 
 ## Advantages
 
-The use of the ERC7786 Aggregator enhances security on cross-chain messaging by removing the trust in one single provider while still supporting the standard and giving flexibility to developers. For example, in a 2 out of 3 aggregator (3 gateways and threshold of 2):
+The use of the ERC7786OpenBridge enhances security on cross-chain messaging by removing the trust in one single provider while still supporting the standard and giving flexibility to developers. For example, in a 2 out of 3 OpenBridge (3 gateways and threshold of 2):
 
  - If one bridge is compromised, the sender is safe (message won't be executed)
  - If one bridge is down, the messages are still delivered (by the other 2 gateways)
@@ -71,7 +71,7 @@ The use of the ERC7786 Aggregator enhances security on cross-chain messaging by 
 
 ## Implementation
 
-The implementation of the ERC7786 Aggregator is available [here](https://github.com/OpenZeppelin/openzeppelin-community-contracts/blob/master/contracts/crosschain/ERC7786Aggregator.sol).
+The implementation of the ERC7786OpenBridge is available [here](https://github.com/OpenZeppelin/openzeppelin-community-contracts/blob/master/contracts/crosschain/ERC7786Aggregator.sol).
 
 
 
