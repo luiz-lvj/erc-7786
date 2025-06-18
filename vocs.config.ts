@@ -37,5 +37,10 @@ export default defineConfig({
       text: 'OpenBridge',
       link: '/openbridge',
     },
-  ]
+  ],
+  theme: {
+    variables: {
+      color: {codeInlineText: { light: '#2073D7', dark: '#4C9DFE' }}
+    }
+  }
 })
