@@ -13,22 +13,6 @@ export default defineConfig({
       text: 'Spec',
       link: '/spec',
     },
-    // {
-    //   text: 'Comparison',
-    //   link: '/comparison',
-    // },
-    // {
-    //   text: 'Ecosystem',
-    //   link: '/ecosystem',
-    // },
-    // {
-    //   text: 'Usage Example',
-    //   link: '/usage-example',
-    // },
-    // {
-    //   text: 'FAQ',
-    //   link: '/faq',
-    // },
     {
       text: 'Examples',
       link: '/examples',
@@ -40,7 +24,7 @@ export default defineConfig({
   ],
   theme: {
     variables: {
-      color: {codeInlineText: { light: '#2073D7', dark: '#4C9DFE' }}
+      color: {codeInlineText: { light: '#2073D7', dark: '#4C9DFE' }, textAccentHover: { light: '#4C9DFE', dark: '#2073D7' }, textAccent: { light: '#2073D7', dark: '#4C9DFE' }},
     }
   }
 })
